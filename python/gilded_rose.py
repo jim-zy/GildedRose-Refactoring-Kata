@@ -39,14 +39,24 @@ class AgedBrieUpdater(ItemUpdater):
 
 
 class BackstagePassUpdater(ItemUpdater):
+    def _get_quality_increase(self, days_remaining):
+        """Calculate quality increase based on days until concert.
+        
+        Args:
+            days_remaining: Number of days until concert (sell_in value)
+            
+        Returns:
+            Quality increase amount: 1 (>10 days), 2 (6-10 days), 3 (1-5 days), 0 (after concert)
+        """
+        if days_remaining < 6:
+            return 3
+        if days_remaining < 11:
+            return 2
+        return 1
+
     def update(self, item):
-        self.increase_quality(item, 1)
-
-        if item.sell_in < 11:
-            self.increase_quality(item, 1)
-
-        if item.sell_in < 6:
-            self.increase_quality(item, 1)
+        quality_increase = self._get_quality_increase(item.sell_in)
+        self.increase_quality(item, quality_increase)
 
         item.sell_in -= 1
 
